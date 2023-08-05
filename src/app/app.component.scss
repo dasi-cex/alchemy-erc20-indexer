@@ -20,8 +20,9 @@
 }
 
 .input-components {
-  padding: 16px;
+  margin: 16px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
 }
 
@@ -33,6 +34,7 @@
 }
 
 .footer {
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
 }
@@ -42,9 +44,9 @@
 }
 
 
-@media (max-width: 800px) {
+@media (min-width: 800px) {
   .input-components {
-    flex-direction: column;
+    flex-direction: row;
     gap: 16px;
   }
 }

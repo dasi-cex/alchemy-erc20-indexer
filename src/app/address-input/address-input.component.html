@@ -12,10 +12,18 @@
       </mat-form-field>
     </form>
     <button 
+      *ngIf="!queryService.fetchTokenDataProcessing$()"
       mat-raised-button 
       color="primary" 
       (click)="onSubmit()" 
       [disabled]="inputForm.invalid"
       >Submit</button>
+    <div *ngIf="queryService.fetchTokenDataProcessing$()" class="fetch-token-data-processing-message">
+      <mat-spinner></mat-spinner>
+      Fetching wallet token data...
+    </div>
+    <div *ngIf="queryService.fetchTokenDataError$()" class="fetch-token-data-error-message">
+      {{ queryService.fetchTokenDataError$() }}
+    </div>
   </div>
 </div>

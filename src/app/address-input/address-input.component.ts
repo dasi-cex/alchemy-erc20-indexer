@@ -16,7 +16,7 @@ export class AddressInputComponent {
 
   constructor(
     private fb: FormBuilder,
-    private queryService: QueryService
+    public queryService: QueryService
   ) { }
 
   onSubmit() {
