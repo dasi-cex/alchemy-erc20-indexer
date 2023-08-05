@@ -1,1 +1,7 @@
-<p>query-output works!</p>
+<div class="content-container">
+  <div *ngIf="(queryService.tokenMetaData$()) as tokenMetaData" class="token-grid-container">
+    <div *ngFor="let token of tokenMetaData" class="token-item">
+      {{ token.name }}
+    </div>
+  </div>
+</div>

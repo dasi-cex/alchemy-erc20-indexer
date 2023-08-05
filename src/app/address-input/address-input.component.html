@@ -1,1 +1,21 @@
-<p>address-input works!</p>
+<div class="content-container">
+  <div class="header-container">
+    <h1>ERC-20 Token Indexer</h1>
+    <div class="subheader">Plug in an address and this website will return all of its ERC-20 token balances!</div>
+  </div>
+  <div class="address-input-container">
+    <form [formGroup]="inputForm" action="">
+      <mat-form-field>
+        <mat-label>Address to Query</mat-label>
+        <input type="text" matInput formControlName="address">
+        <mat-error>Input must be a 40 character ethereum address with a "0x" prefix.</mat-error>
+      </mat-form-field>
+    </form>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onSubmit()" 
+      [disabled]="inputForm.invalid"
+      >Submit</button>
+  </div>
+</div>

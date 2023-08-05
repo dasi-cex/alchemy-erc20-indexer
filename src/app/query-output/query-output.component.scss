@@ -1,0 +1,24 @@
+.token-grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; // Divide grid into x columns of equal width
+  grid-column-gap: 8px;
+  grid-row-gap: 8px;
+}
+
+.token-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media screen and (min-width: 500px) {
+  .token-grid-container {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  .token-grid-container {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}

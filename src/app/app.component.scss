@@ -20,8 +20,7 @@
 }
 
 .input-components {
-  padding-top: 16px;
-  padding-bottom: 16px;
+  padding: 16px;
   display: flex;
   justify-content: center;
 }
@@ -33,9 +32,17 @@
   justify-content: center;
 }
 
+.footer {
+  display: flex;
+  flex-direction: column;
+}
+
+.version {
+  text-align: center;
+}
+
 
 @media (max-width: 800px) {
-
   .input-components {
     flex-direction: column;
     gap: 16px;
