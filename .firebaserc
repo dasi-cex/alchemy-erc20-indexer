@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "alchemy-erc20-indexer"
+  },
+  "targets": {
+    "alchemy-erc20-indexer": {
+      "hosting": {
+        "ng-erc20-indexer": [
+          "alchemy-erc20-indexer"
+        ]
+      }
+    }
+  }
+}
