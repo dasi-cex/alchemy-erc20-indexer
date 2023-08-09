@@ -15,7 +15,7 @@ import { QueryOutputComponent } from './query-output/query-output.component';
   declarations: [
     AppComponent,
     AddressInputComponent,
-    QueryOutputComponent
+    QueryOutputComponent,
   ],
   imports: [
     BrowserModule,

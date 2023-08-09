@@ -8,7 +8,7 @@
       <mat-form-field>
         <mat-label>Address to Query</mat-label>
         <input type="text" matInput formControlName="address">
-        <mat-error>Input must be a 40 character ethereum address with a "0x" prefix.</mat-error>
+        <mat-error>Input must be a 42 character ethereum address OR a an ENS address.</mat-error>
       </mat-form-field>
     </form>
     <button 
@@ -18,12 +18,21 @@
       (click)="onSubmit()" 
       [disabled]="inputForm.invalid"
       >Submit</button>
+    <button 
+      *ngIf="!queryService.fetchTokenDataProcessing$()"
+      mat-stroked-button 
+      color="primary" 
+      (click)="onScanConnectedWallet()" 
+      >Scan Connected Wallet</button>
     <div *ngIf="queryService.fetchTokenDataProcessing$()" class="fetch-token-data-processing-message">
       <mat-spinner></mat-spinner>
       Fetching wallet token data...
     </div>
     <div *ngIf="queryService.fetchTokenDataError$()" class="fetch-token-data-error-message">
       {{ queryService.fetchTokenDataError$() }}
+    </div>
+    <div class="current-network">
+      Current Network: {{ evmService.providerNetwork$()?.name ? evmService.providerNetwork$()?.name : 'No wallet connected.' }}
     </div>
   </div>
 </div>

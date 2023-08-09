@@ -1,8 +1,10 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Functions, httpsCallableData } from '@angular/fire/functions';
-import { TokenMetadataResponse } from 'alchemy-sdk';
 import { Observable, catchError, map, shareReplay, take, throwError } from 'rxjs';
+import { AlchemyTokenData } from 'shared-models/alchemy-token-data.model';
 import { FbFunctionNames } from 'shared-models/fb-function-names.model';
+import { EvmService } from './evm.service';
+import { TokenDataRequest } from 'shared-models/token-data-request.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,23 +15,42 @@ export class QueryService {
 
   fetchTokenDataError$ = signal<string | undefined>(undefined);
   fetchTokenDataProcessing$ = signal<boolean>(false);
-  tokenMetaData$ = signal<TokenMetadataResponse[] | undefined>(undefined);
+  tokenMetaData$ = signal<AlchemyTokenData[] | undefined>(undefined);
 
   constructor(
-    
+    private evmService: EvmService
   ) { }
 
-  fetchTokenData(walletAddress: string): Observable<TokenMetadataResponse[]> {
-    console.log('Submitting fetchTokenData to server with this data', walletAddress);
+  fetchTokenData(walletAddress: string): Observable<AlchemyTokenData[]> {
+
+    if (!this.evmService.isValidNetwork()) {
+      const error = 'Invalid network detected. Please connect to Sepolia or Mainnet and try again.';
+      this.fetchTokenDataError$.set(error);
+      this.fetchTokenDataProcessing$.set(false);
+      return throwError(() => new Error(error));
+    }
+
+    if (!this.evmService.isValidEnsRequest(walletAddress)) {
+      const error = 'ENS queries are only available on Mainnet. Please switch networks and try again.';
+      this.fetchTokenDataError$.set(error);
+      this.fetchTokenDataProcessing$.set(false);
+      return throwError(() => new Error(error));
+    }
+
+    const tokenDataRequest: TokenDataRequest = {
+      address: walletAddress,
+      chainId: this.evmService.providerNetwork$()!.chainId
+    };
+
+    console.log('Submitting fetchTokenData to server with this data', tokenDataRequest);
     this.fetchTokenDataError$.set(undefined);
     this.fetchTokenDataProcessing$.set(true);
-    console.log('Will deploy to this function name', FbFunctionNames.ON_CALL_FETCH_TOKEN_DATA);
 
-    const fetchTokenDataHttpCall: (data: string) => Observable<TokenMetadataResponse[]> = httpsCallableData(
+    const fetchTokenDataHttpCall: (data: TokenDataRequest) => Observable<AlchemyTokenData[]> = httpsCallableData(
       this.functions,
       FbFunctionNames.ON_CALL_FETCH_TOKEN_DATA
     );
-    const res = fetchTokenDataHttpCall(walletAddress)
+    const res = fetchTokenDataHttpCall(tokenDataRequest)
       .pipe(
         take(1),
         map(tokenMetadataArray => {
@@ -44,6 +65,7 @@ export class QueryService {
         shareReplay(),
         catchError(error => {
           this.fetchTokenDataError$.set(error);
+          this.fetchTokenDataProcessing$.set(false);
           return throwError(() => new Error(error));
         })
       );

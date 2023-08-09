@@ -1,8 +1,9 @@
 <div class="content-container">
   <div *ngIf="(queryService.tokenMetaData$()) as tokenMetaData" class="token-grid-container">
     <div *ngFor="let token of tokenMetaData" class="token-item">
-      <div class="token-icon"><img [src]="token.logo || 'assets/generic-erc-20-token.png'" alt=""></div>
-      <div class="token-name">{{ token.name }}</div>
+      <div class="token-icon"><img [src]="token.metaData.logo || 'assets/generic-erc-20-token.png'" alt=""></div>
+      <div class="token-name">{{ token | hexBalanceToDecimal | number }}</div>
+      <div class="token-name">{{ token.metaData.name }}</div>
     </div>
   </div>
 </div>
