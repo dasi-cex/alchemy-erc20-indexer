@@ -1,16 +1,16 @@
 import { CallableOptions, CallableRequest, HttpsError, onCall } from 'firebase-functions/v2/https';
 import { defineSecret } from 'firebase-functions/params';
 import { logger } from 'firebase-functions/v2';
-import { Alchemy, AlchemySettings, Network } from 'alchemy-sdk';
+import { Alchemy, AlchemySettings, Network, OwnedNft } from 'alchemy-sdk';
 import { AlchemyVars } from '../../shared-models/alchemy-vars.model';
-import { AlchemyTokenData } from '../../shared-models/alchemy-token-data.model';
+import { AlchemyCombinedTokenData, AlchemyErc20TokenData } from '../../shared-models/alchemy-token-data.model';
 import { TokenDataRequest } from '../../shared-models/token-data-request.model';
 import { EthereumChainIds } from '../../shared-models/ethereum-chain-ids.model';
 
 const alchemySepoliaApiKey = defineSecret(AlchemyVars.ALCHEMY_SEPOLIA_API_KEY);
 const alchemyMainnetApiKey = defineSecret(AlchemyVars.ALCHEMY_MAINNET_API_KEY);
 
-const fetchTokenData = async (tokenDataRequest: TokenDataRequest): Promise<AlchemyTokenData[]> => {
+const fetchTokenData = async (tokenDataRequest: TokenDataRequest): Promise<AlchemyCombinedTokenData> => {
   let walletAddress = tokenDataRequest.address;
   
   const config = getAlchemyConfig(tokenDataRequest.chainId);
@@ -20,13 +20,30 @@ const fetchTokenData = async (tokenDataRequest: TokenDataRequest): Promise<Alche
     const resolvedAddress = await resolveEnsName(walletAddress, alchemy);
     if (!resolvedAddress) {
       logger.log(`No address associated with ${walletAddress} was found.`);
-      return [];
+      
+      // If no address associated with ENS, return empty arrays
+      return {
+        erc20DataArray: [],
+        nftDataArray: []
+      };
     }
     walletAddress = resolvedAddress;
   }
 
+  const erc20DataArray: AlchemyErc20TokenData[] = await fetchErc20Data(walletAddress, alchemy);
+  const nftDataArray: OwnedNft[] = await fetchNftData(walletAddress, alchemy);
+
+  const combinedTokenData: AlchemyCombinedTokenData = {
+    erc20DataArray,
+    nftDataArray
+  };
+
+  return combinedTokenData;
+}
+
+const fetchErc20Data = async (walletAddress: string, alchemy: Alchemy): Promise<AlchemyErc20TokenData[]> => {
   const alchemyResponse = await alchemy.core.getTokenBalances(walletAddress)
-    .catch(err => {logger.log(`Failed to fetchTokenBalances from Alchemy`, err); throw new HttpsError('internal', err);});
+    .catch(err => {logger.log(`Failed to getTokenBalances from Alchemy`, err); throw new HttpsError('internal', err);});
 
   const tokenDataPromises = alchemyResponse.tokenBalances.map(async tokenData => {
     const metaData = await alchemy.core.getTokenMetadata(
@@ -36,7 +53,7 @@ const fetchTokenData = async (tokenDataRequest: TokenDataRequest): Promise<Alche
     const contractAddress = tokenData.contractAddress;
     const hexBalance = tokenData.tokenBalance;
 
-    const alchemyTokenData: AlchemyTokenData = {
+    const alchemyTokenData: AlchemyErc20TokenData = {
       contractAddress,
       hexBalance,
       metaData
@@ -44,10 +61,19 @@ const fetchTokenData = async (tokenDataRequest: TokenDataRequest): Promise<Alche
 
     return alchemyTokenData;
   })
-  
+
   const tokenDataArray = Promise.all(tokenDataPromises);
 
   return tokenDataArray;
+}
+
+const fetchNftData = async (walletAddress: string, alchemy: Alchemy): Promise<OwnedNft[]> => {
+  const alchemyResponse = await alchemy.nft.getNftsForOwner(walletAddress)
+    .catch(err => {logger.log(`Failed to getNftsForOwner from Alchemy`, err); throw new HttpsError('internal', err);});
+
+  const ownedNftArray = alchemyResponse.ownedNfts;
+
+  return ownedNftArray;
 }
 
 const getAlchemyConfig = (chainId: number): AlchemySettings => {
@@ -98,7 +124,7 @@ const callableOptions: CallableOptions = {
   secrets: [alchemySepoliaApiKey, alchemyMainnetApiKey]
 }
 
-export const onCallFetchTokenData = onCall( callableOptions, async (request: CallableRequest<TokenDataRequest>): Promise<AlchemyTokenData[]> => {
+export const onCallFetchTokenData = onCall( callableOptions, async (request: CallableRequest<TokenDataRequest>): Promise<AlchemyCombinedTokenData> => {
   const tokenDataRequest = request.data;
   logger.log('onCallFetchTokenData request received with this data:', tokenDataRequest);
   return fetchTokenData(tokenDataRequest);

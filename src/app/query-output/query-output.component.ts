@@ -8,6 +8,8 @@ import { QueryService } from '../services/query.service';
 })
 export class QueryOutputComponent {
 
+  // TODO: Turn this into a tab where one tab shows ERC20s and one tab shows NFTs
+
   constructor(
     public queryService: QueryService
   ) {}

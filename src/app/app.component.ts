@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'ng-erc20-indexer';
-  version = '0.0.2';
+  version = '0.0.3';
   showVersion = false;
 
   onShowVersion() {

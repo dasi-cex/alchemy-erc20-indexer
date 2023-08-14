@@ -1,9 +1,23 @@
-<div class="content-container">
-  <div *ngIf="(queryService.tokenMetaData$()) as tokenMetaData" class="token-grid-container">
-    <div *ngFor="let token of tokenMetaData" class="token-item">
-      <div class="token-icon"><img [src]="token.metaData.logo || 'assets/generic-erc-20-token.png'" alt=""></div>
-      <div class="token-name">{{ token | hexBalanceToDecimal | number }}</div>
-      <div class="token-name">{{ token.metaData.name }}</div>
-    </div>
-  </div>
+<div class="content-container" *ngIf="(queryService.combinedTokenData()) as combinedTokenData">
+  <mat-tab-group mat-stretch-tabs="true" mat-align-tabs="start">
+    <mat-tab label="ERC20s">
+      <div  class="token-grid-container">
+        <div *ngFor="let erc20token of combinedTokenData.erc20DataArray" class="token-item">
+          <div class="token-icon"><img [src]="erc20token.metaData.logo || 'assets/generic-erc-20-token.png'" alt=""></div>
+          <div class="token-balance">{{ erc20token | hexBalanceToDecimal | number }}</div>
+          <div class="token-name">{{ erc20token.metaData.name }}</div>
+        </div>
+      </div>
+    </mat-tab>
+    <mat-tab label="NFTs">
+      <div  class="token-grid-container">
+        <div *ngFor="let nft of combinedTokenData.nftDataArray" class="token-item">
+          <div class="token-icon"><img [src]="nft.media[0].gateway || 'assets/generic-erc-20-token.png'" alt=""></div>
+          <div class="token-name">{{ nft.title }} </div>
+          <div class="token-id">ID: {{ nft.tokenId }} </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>
+

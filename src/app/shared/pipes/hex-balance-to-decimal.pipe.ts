@@ -1,13 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { BigNumber } from 'ethers';
-import { AlchemyTokenData } from 'shared-models/alchemy-token-data.model';
+import { AlchemyErc20TokenData } from 'shared-models/alchemy-token-data.model';
 
 @Pipe({
   name: 'hexBalanceToDecimal'
 })
 export class HexBalanceToDecimalPipe implements PipeTransform {
 
-  transform(tokenData: AlchemyTokenData): number {
+  transform(tokenData: AlchemyErc20TokenData): number {
     if (!tokenData || typeof tokenData !== 'object' || !tokenData.hexBalance || !tokenData.metaData.decimals) {
       return 0;
     }

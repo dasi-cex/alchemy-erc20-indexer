@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Functions, httpsCallableData } from '@angular/fire/functions';
 import { Observable, catchError, map, shareReplay, take, throwError } from 'rxjs';
-import { AlchemyTokenData } from 'shared-models/alchemy-token-data.model';
+import { AlchemyCombinedTokenData } from 'shared-models/alchemy-token-data.model';
 import { FbFunctionNames } from 'shared-models/fb-function-names.model';
 import { EvmService } from './evm.service';
 import { TokenDataRequest } from 'shared-models/token-data-request.model';
@@ -15,13 +15,13 @@ export class QueryService {
 
   fetchTokenDataError$ = signal<string | undefined>(undefined);
   fetchTokenDataProcessing$ = signal<boolean>(false);
-  tokenMetaData$ = signal<AlchemyTokenData[] | undefined>(undefined);
+  combinedTokenData = signal<AlchemyCombinedTokenData | undefined>(undefined);
 
   constructor(
     private evmService: EvmService
   ) { }
 
-  fetchTokenData(walletAddress: string): Observable<AlchemyTokenData[]> {
+  fetchTokenData(walletAddress: string): Observable<AlchemyCombinedTokenData> {
 
     if (!this.evmService.isValidNetwork()) {
       const error = 'Invalid network detected. Please connect to Sepolia or Mainnet and try again.';
@@ -46,21 +46,21 @@ export class QueryService {
     this.fetchTokenDataError$.set(undefined);
     this.fetchTokenDataProcessing$.set(true);
 
-    const fetchTokenDataHttpCall: (data: TokenDataRequest) => Observable<AlchemyTokenData[]> = httpsCallableData(
+    const fetchTokenDataHttpCall: (data: TokenDataRequest) => Observable<AlchemyCombinedTokenData> = httpsCallableData(
       this.functions,
       FbFunctionNames.ON_CALL_FETCH_TOKEN_DATA
     );
     const res = fetchTokenDataHttpCall(tokenDataRequest)
       .pipe(
         take(1),
-        map(tokenMetadataArray => {
-          console.log('Fetched this token metadata:', tokenMetadataArray);
-          if (!tokenMetadataArray) {
-            throw new Error(`No token metadata in response.`);
+        map(combinedTokenData => {
+          console.log('Fetched this combinedTokenData:', combinedTokenData);
+          if (!combinedTokenData) {
+            throw new Error(`No combinedTokenData in response.`);
           }
           this.fetchTokenDataProcessing$.set(false);
-          this.tokenMetaData$.set(tokenMetadataArray);
-          return tokenMetadataArray;
+          this.combinedTokenData.set(combinedTokenData);
+          return combinedTokenData;
         }),
         shareReplay(),
         catchError(error => {

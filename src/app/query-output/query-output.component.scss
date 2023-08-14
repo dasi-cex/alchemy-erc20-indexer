@@ -1,4 +1,18 @@
+@use '@angular/material' as mat;
+
+.content-container {
+  @include mat.elevation(2);
+  background-color: white;
+  min-width: 340px;
+  max-width: 600px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .token-grid-container {
+  margin-top: 16px;
   display: grid;
   grid-template-columns: 1fr 1fr; // Divide grid into x columns of equal width
   grid-column-gap: 8px;
@@ -10,6 +24,14 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
+}
+
+.token-name, .token-id, .token-balance {
+  width: 140px;
+  white-space: break-spaces;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 img {
@@ -23,6 +45,11 @@ img {
 }
 
 @media screen and (min-width: 800px) {
+
+  .content-container {
+    width: 600px;
+  }
+
   .token-grid-container {
     grid-template-columns: 1fr 1fr 1fr 1fr;
   }
