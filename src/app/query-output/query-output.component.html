@@ -3,7 +3,9 @@
     <mat-tab label="ERC20s">
       <div  class="token-grid-container">
         <div *ngFor="let erc20token of combinedTokenData.erc20DataArray" class="token-item">
-          <div class="token-icon"><img [src]="erc20token.metaData.logo || 'assets/generic-erc-20-token.png'" alt=""></div>
+          <a [href]="etherscanUrl$() + 'token/' + erc20token.contractAddress" target="_blank">
+            <div class="token-icon"><img [src]="erc20token.metaData.logo || 'assets/generic-erc-20-token.png'" alt=""></div>
+          </a>
           <div class="token-balance">{{ erc20token | hexBalanceToDecimal | number }}</div>
           <div class="token-name">{{ erc20token.metaData.name }}</div>
         </div>
@@ -12,7 +14,9 @@
     <mat-tab label="NFTs">
       <div  class="token-grid-container">
         <div *ngFor="let nft of combinedTokenData.nftDataArray" class="token-item">
-          <div class="token-icon"><img [src]="nft.media[0].gateway || 'assets/generic-erc-20-token.png'" alt=""></div>
+          <a [href]="etherscanUrl$() + 'nft/' + nft.contract.address + '/' + nft.tokenId" target="_blank">
+            <div class="token-icon"><img [src]="nft.media[0].gateway || 'assets/generic-erc-20-token.png'" alt=""></div>
+          </a>
           <div class="token-name">{{ nft.title }} </div>
           <div class="token-id">ID: {{ nft.tokenId }} </div>
         </div>
@@ -20,4 +24,3 @@
     </mat-tab>
   </mat-tab-group>
 </div>
-
