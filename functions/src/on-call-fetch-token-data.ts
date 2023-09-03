@@ -121,7 +121,8 @@ const resolveEnsName = async (ensAddress: string, alchemy: Alchemy): Promise<str
 /////// DEPLOYABLE FUNCTIONS ///////
 
 const callableOptions: CallableOptions = {
-  secrets: [alchemySepoliaApiKey, alchemyMainnetApiKey]
+  secrets: [alchemySepoliaApiKey, alchemyMainnetApiKey],
+  enforceAppCheck: true
 }
 
 export const onCallFetchTokenData = onCall( callableOptions, async (request: CallableRequest<TokenDataRequest>): Promise<AlchemyCombinedTokenData> => {

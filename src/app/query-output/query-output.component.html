@@ -15,7 +15,7 @@
       <div  class="token-grid-container">
         <div *ngFor="let nft of combinedTokenData.nftDataArray" class="token-item">
           <a [href]="etherscanUrl$() + 'nft/' + nft.contract.address + '/' + nft.tokenId" target="_blank">
-            <div class="token-icon"><img [src]="nft.media[0].gateway || 'assets/generic-erc-20-token.png'" alt=""></div>
+            <div class="token-icon"><img [src]="nft.media[0] ? nft.media[0].gateway : 'assets/generic-erc-20-token.png'" alt=""></div>
           </a>
           <div class="token-name">{{ nft.title }} </div>
           <div class="token-id">ID: {{ nft.tokenId }} </div>
